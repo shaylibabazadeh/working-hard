@@ -14,7 +14,7 @@ if (is.numeric(as.numeric(no_input)) & #first it will check if the input is a nu
   if( as.integer(split_no[1])^3 + as.integer(split_no[2])^3 + as.integer(split_no[3])^3 == no_input) { #this is the inner if statement 
     print(paste(no_input, "is a narcissistic number")) #using the paste function, the original number which is stored in a variable will be used to announce whether or not the number is narcissistic 
   } else { #this is the else condition for the  inner if statement 
-    print(paste(no_input, "is not a narcissistic number"))
+    print(paste(no_input, "is not a narcissistic number")) #same thing but if the conditions for a narcissistic number are not met 
   }
 } else { #this is the else condition for the outer if statement 
   print("Entry is not valid. Terminating...") #the program will terminate if the original conditions for a 3 digit positive number input are not met. 
