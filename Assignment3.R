@@ -59,7 +59,7 @@ while (TRUE) {
   
   #We will check if the player has guessed the entire secret word correctly
   if (all(strsplit(secret_word, "")[[1]] %in% guessed_letters)) {
-    print("WINNER! You guessed the secret word!")
+    print(paste0("WINNER! You guessed the secret word! It was ", secret_word, "!!"))
     return(TRUE)  #Return TRUE to indicate the game is over
   }
   
