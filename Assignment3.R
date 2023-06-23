@@ -1,72 +1,77 @@
+##ASSIGNMENT 3
 
-#################
-#first we are going to read the textfile from the working directory
-word_file <- "words.txt"
-words <- as.list(readLines(word_file))
-
-#then we are going to take a sample from the list using the sample() function 
-word_for_play <- sample(words, size = 1)
-word_length <- nchar(word_for_play)
-# We will create a vector to store the guessed letters
+#First we are going to read the textfile from the working directory
+word_list <- readLines("words.txt")
+# We want to choose a random word from the list, and want to announce how long it is 
+secret_word <- tolower(sample(word_list, 1))
+word_length <- nchar(secret_word)
+#We will create a vector to store the guessed letters
 guessed_letters <- vector(mode = "character", length = 0)
-# As for the rules, there are 8 guesses allowed so we will define the maximum number of incorrect guesses
+#As for the rules, there are 8 guesses allowed so we will define the maximum number of incorrect guesses
 incorrrect_limit <- 8
-
-#then I will welcome the user to the game and let them know how long the secret word is.
+game_state <- list(secret_word = secret_word, guessed_letters = guessed_letters, incorrrect_limit = incorrrect_limit)
+#Welcome the user to the game and inform them about the secret word's length
 print(paste("Welcome to Hangman! The secret word is", word_length, "letters long."))
 
-#####list(secret_word = secret_word, guessed_letters = guessed_letters, incorrrect_limit = incorrrect_limit)
-##############
-
-#For this game, they have 8 chances to guess the wrong letter before they will lose. 
-
-#we are going to create a while loop to ensure that the input is correct and we can proceed. 
-valid_input <- FALSE # first we have to set valid input to false so that it will loop through the while loop
-guess_count <- 0 
-while (!valid_input){
-  #First we will ask for them to input their first guess 
-  user_input = readline(prompt = "Please enter your first guess now (one letter):")
-  
-  if (nchar(user_input) == 1) { #here is the outer most if statement to ensure that the input is valid 
-    if (grepl("^[a-zA-Z]$", user_input)) { #here is the second if statement which will check to see if the input is either an upper case or lower case letter 
-      valid_input <- TRUE #once the conditions are met then we can exit the loop 
-      print("Valid input!")
-
-      # Display the secret word with dashes for unguessed letters
-      guessed_letters <- vector(mode = "character", length = 0)
-      word_display <- ""
-      for (user_input in strsplit(as.character(word_for_play), "")[[1]]) {
-        if (user_input %in% guessed_letters) {
-          word_display <- paste(word_display, user_input, sep = "")
-        } else {
-          word_display <- paste(word_display, "_", sep = "")
-        }
-      }
-      print(word_display)
-      
-      # Display the guessed letters
-      guessed_letters_str <- paste(guessed_letters, collapse = ", ")
-      print(paste("Guessed letters:", guessed_letters_str))
-      
-      
-      guess_count = guess_count + 1
+# I will use a while loop so that it continues to ask for a user input until either the word is guessed or there has been more than 8 incorrect guesses
+while (TRUE) { 
+  # Display the secret word with dashes for unguessed letters
+  # Initialize an empty string to hold the word display
+  word_display <- ""
+  #Iterate over each letter in the secret word, separating by nothing so it splits the word by each letter individually
+  for (letter in strsplit(secret_word, "")[[1]]) {
+    #Check if the letter is already guessed from the list of previously guessed letters
+    if (letter %in% guessed_letters) {
+      #If the letter is guessed we will add it to the word display
+      word_display <- paste(word_display, letter, sep = "")
     } else {
-      print("Invalid input. You must enter a letter. Try again.")
+      #If the letter is not guessed we will add a placeholder underscore to the word display
+      word_display <- paste(word_display, "_", sep = "")
     }
-  } else { # here is the else statement for the outer most if statement which will promt the user to try again
-    print("Invalid input. You must enter one letter only. Try again.")
   }
-}
-
-
-
-#at this point we have out first input and it is valid. 
-while(guess_count <= 6) {
-  if (user_input %in% strsplit(as.character(word_for_play), "")[[1]]) {
-  print("Good job! The secret word has that letter.")
-  print(paste("Used letters:", used_words))
-  } else {
-  print(FALSE)
+  # Print the word display to show the current state of the guessed word
+  print(word_display)
+  
+  
+  # Display the guessed letters so that the user can keep count and this will ensure that the game is efficient
+  guessed_letters_str <- paste(guessed_letters, collapse = ", ")
+  print(paste("Guessed letters:", guessed_letters_str))
+  # Ask the user for a guess
+  guess <- readline("Enter a letter: ")
+  # We need to make sure that the guess meets the requirements 
+  if (nchar(guess) != 1) { #it must only be one character long
+    print("Invalid input. You must enter one letter only. Try again.") #if it is longer then it will tell the user what their input error was
+    next
   }
-}
+  # We will convert the guess to lowercase to make identification easier 
+  guess <- tolower(guess)
+  
+  # We also want to check if the input is a letter, it shouldn't be a number or character. 
+  if (!grepl("^[a-z]$", guess)) {
+    print("Invalid input. You must enter a letter. Please try again.")
+    next
+  }
+  
+  #After a valid input has been entered, it will be added to the list of guessed letters form before to update as the while loop continues to loop
+  guessed_letters <- c(guessed_letters, guess)
+  
+  #In each loop, we will check if the conditions of the game have been met and if the game can be over. 
+  
+  #We will check if the player has guessed the entire secret word correctly
+  if (all(strsplit(secret_word, "")[[1]] %in% guessed_letters)) {
+    print("WINNER! You guessed the secret word!")
+    return(TRUE)  #Return TRUE to indicate the game is over
+  }
+  
+  #Then we will calculate the number of incorrect guesses by counting letters in guessed_letters not present in the secret word
+  incorrect_guesses <- sum(!(guessed_letters %in% strsplit(secret_word, "")[[1]]))
+  #If the player has exceeded the maximum allowed incorrect guesses, the game will end 
+  if (incorrect_guesses >= incorrrect_limit) {
+    print("Game over! You lost):")
+    print(paste("The secret word was:", secret_word))
+    return(TRUE)  # Return TRUE to indicate the game is over
+  }
+  
+}#closing the while loop 
+
 
